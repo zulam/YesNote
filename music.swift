@@ -8,6 +8,7 @@
 
 import Foundation
 
+//arrays containing notes by classification
 let notesFlats = ["Ab", "A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G"];
 let notesSharps = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"];
 let notesNats = ["A", "B", "C", "D", "E", "F", "G"];
@@ -17,6 +18,8 @@ var startIndex = 0;
 
 let indexLimit = 12;
 let scaleLengthLimit = 7;
+
+//intervals (whole/half steps) for each scale
 let ionian = [2, 2, 1, 2, 2, 2, 1];
 let dorian = [2, 1, 2, 2, 2, 1, 2];
 let phrygian = [1, 2, 2, 2, 1, 2, 2];
@@ -30,6 +33,8 @@ let revDim = [1, 2, 1, 2, 1, 2, 1, 2];
 let altered = [1, 2, 1, 2, 2, 2, 2];
 
 let scales = [ionian, dorian, phrygian, lydian, mixolydian, aolian, locrian, wholeTone, diminished, revDim, altered]
+
+var usingApp = true;
 
 class Chord {
     var chordTone:String;
@@ -66,7 +71,7 @@ class Chord {
         scaleSharpFlatNat = "";
     }
     
-    //determine sharps, flats, or nats
+    //determine sharps, flats, or nats; messy for now
     func determineSFN() {
         if (chordTone.contains("#")) {
             scaleSharpFlatNat = "#";
@@ -150,6 +155,7 @@ class Chord {
         }
     }
     
+    //find starting point in calculating scale
     func findStart() {
         if scaleSharpFlatNat == "#" {
             for notes in notesSharps {
@@ -175,6 +181,7 @@ class Chord {
         }
     }
     
+    //determine all possible notes from scale
     func determineNoteBankSharp() {
         var ctr3 = 0;
         while (ctr3 < scaleLengthLimit) {
@@ -217,6 +224,7 @@ class Chord {
         }
     }
     
+    //generate a random solo
     func generateSolo() {
         var ctr = 0;
         while (ctr < scaleLengthLimit + 1) {
@@ -232,5 +240,15 @@ class Chord {
         print(soloNoteBank);
         print("solo: ");
         print(solo);
+    }
+}
+
+func keepUsing() {
+    print("Enter another chord? (Y or N): ");
+    let answer = readLine();
+    if (answer == "Y" ) {
+        usingApp = true;
+    } else {
+        usingApp = false;
     }
 }
