@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Darwin
 
 //arrays containing notes by classification
 let notesFlats = ["Ab", "A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G"];
@@ -17,7 +18,7 @@ let allNotes = ["Ab", "A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G",
 var startIndex = 0;
 
 let indexLimit = 12;
-let scaleLengthLimit = 7;
+var scaleLengthLimit = 7;
 
 //intervals (whole/half steps) for each scale
 let ionian = [2, 2, 1, 2, 2, 2, 1];
@@ -44,31 +45,65 @@ class Chord {
     var soloScale:[Int]!;
     var scaleSharpFlatNat:String;
     var solo = [String]();
+    var soloLength:Int;
 
     //determine chord and matching scale name
-    init(root: String, quality: String) {
+    init(root: String, quality: String, length: Int) {
         chordTone = root;
         chordQuality = quality;
         finalChord = root + quality;
+        soloLength = length * 8;
         switch (chordQuality) {
             case ("maj"): soloScale = ionian
             case ("maj7"): soloScale = ionian
             case ("maj6"): soloScale = ionian
-            case ("min"): soloScale = dorian
-            case ("min7"): soloScale = aolian
+            case ("min"): soloScale = [-1]
+            case ("min7"): soloScale = [-1]
             case ("min6"): soloScale = dorian
             case ("maj7b5"): soloScale = lydian
-            case ("7"): soloScale = mixolydian
+            case ("7"): soloScale = [-1]
             case ("min7b5"): soloScale = locrian
-            case ("dim"): soloScale = diminished
-            case ("7b9"): soloScale = altered
-            case ("7#9"): soloScale = altered
-            case ("7b5"): soloScale = wholeTone
-            case ("7#5"): soloScale = wholeTone
+            case ("dim"): soloScale = [-1]; scaleLengthLimit = 8
+            case ("7b9"): soloScale = [-1]
+            case ("7#9"): soloScale = [-1]
+            case ("7b5"): soloScale = [-1]
+            case ("7#5"): soloScale = [-1]
             default: soloScale = ionian
         }
         soloNoteBank = []
         scaleSharpFlatNat = "";
+    }
+    
+    func specificSelector() {
+        var choiceInput:String;
+        if (chordQuality.contains("minor")){
+            print("Select a further option: dorian (less happier/funkier) or aolian (sadder/more minor)?")
+            choiceInput = readLine()!;
+            switch (choiceInput) {
+                case "dorian": soloScale = dorian
+                case "aolian": soloScale = aolian
+                default: soloScale = aolian
+            }
+        
+        } else if (chordQuality.contains("7") && !chordQuality.contains("min")) {
+            print("Select a further option: mixolydian (most resonant), whole tone (hip), or altered (hip with dissonance)?")
+            choiceInput = readLine()!;
+            switch (choiceInput) {
+                case "mixolydian": soloScale = mixolydian
+                case "whole tone": soloScale = wholeTone; scaleLengthLimit = 6
+                case "altered": soloScale = altered
+                default: soloScale = mixolydian
+            }
+        }
+        else if (chordQuality.contains("dim")) {
+            print("Select a further option: wholehalf or halfwhole?")
+            choiceInput = readLine()!;
+            switch (choiceInput) {
+                case "wholehalf": soloScale = diminished
+                case "halfwhole": soloScale = revDim
+                default: soloScale = diminished
+            }
+        }
     }
     
     //determine sharps, flats, or nats; messy for now
@@ -80,9 +115,9 @@ class Chord {
             
         } else {
             if (chordTone == "A") {
-                if (soloScale == ionian || soloScale == dorian || soloScale == lydian || soloScale == mixolydian) {
+                if (soloScale == ionian || soloScale == dorian || soloScale == lydian || soloScale == mixolydian || soloScale == wholeTone || soloScale == altered) {
                     scaleSharpFlatNat = "#";
-                } else if (soloScale == phrygian || soloScale == locrian || soloScale == mixolydian) {
+                } else if (soloScale == phrygian || soloScale == locrian || soloScale == altered ) {
                     scaleSharpFlatNat = "b";
                 }
                 else {
@@ -92,17 +127,20 @@ class Chord {
             }
                 
             else if (chordTone == "B") {
-                if (soloScale == ionian || soloScale == dorian || soloScale == phrygian || soloScale == lydian || soloScale == mixolydian || soloScale == aolian) {
+                if (soloScale == ionian || soloScale == dorian || soloScale == phrygian || soloScale == lydian || soloScale == mixolydian || soloScale == aolian || soloScale == wholeTone) {
                     scaleSharpFlatNat = "#";
-                } else {
+                } else if (soloScale == altered) {
+                    scaleSharpFlatNat = "b";
+                }
+                else {
                     scaleSharpFlatNat = "";
                 }
             }
                 
             else if (chordTone == "C") {
-                if (soloScale == lydian) {
+                if (soloScale == lydian || soloScale == altered) {
                     scaleSharpFlatNat = "#";
-                } else if (soloScale == dorian || soloScale == phrygian || soloScale == mixolydian || soloScale == aolian || soloScale == locrian) {
+                } else if (soloScale == dorian || soloScale == phrygian || soloScale == mixolydian || soloScale == aolian || soloScale == locrian || soloScale == wholeTone) {
                     scaleSharpFlatNat = "b";
                 } else {
                     scaleSharpFlatNat = "";
@@ -110,9 +148,9 @@ class Chord {
             }
                 
             else if (chordTone == "D") {
-                if (soloScale == ionian || soloScale == lydian || soloScale == mixolydian) {
+                if (soloScale == ionian || soloScale == lydian || soloScale == mixolydian || soloScale == wholeTone) {
                     scaleSharpFlatNat = "#";
-                } else if (soloScale == phrygian || soloScale == aolian || soloScale == locrian) {
+                } else if (soloScale == phrygian || soloScale == aolian || soloScale == locrian || soloScale == wholeTone) {
                     scaleSharpFlatNat = "b";
                 }
                 else {
@@ -121,9 +159,9 @@ class Chord {
             }
                 
             else if (chordTone == "E") {
-                if (soloScale == ionian || soloScale == dorian || soloScale == lydian || soloScale == mixolydian || soloScale == aolian) {
+                if (soloScale == ionian || soloScale == dorian || soloScale == lydian || soloScale == mixolydian || soloScale == aolian || soloScale == wholeTone) {
                     scaleSharpFlatNat = "#";
-                } else if (soloScale == locrian) {
+                } else if (soloScale == locrian || soloScale == altered) {
                     scaleSharpFlatNat = "b";
                 }
                 else {
@@ -132,8 +170,10 @@ class Chord {
             }
                 
             else if (chordTone == "F") {
-                if (soloScale == ionian || soloScale == dorian || soloScale == phrygian || soloScale == mixolydian || soloScale == aolian || soloScale == locrian) {
+                if (soloScale == ionian || soloScale == dorian || soloScale == phrygian || soloScale == mixolydian || soloScale == aolian || soloScale == locrian || soloScale == altered) {
                     scaleSharpFlatNat = "b";
+                } else if (soloScale == wholeTone) {
+                    scaleSharpFlatNat = "#";
                 }
                 else {
                     scaleSharpFlatNat = "";
@@ -141,9 +181,9 @@ class Chord {
             }
                 
             else if (chordTone == "G") {
-                if (soloScale == ionian || soloScale == lydian) {
+                if (soloScale == ionian || soloScale == lydian || soloScale == wholeTone) {
                     scaleSharpFlatNat = "#";
-                } else if (soloScale == dorian || soloScale == phrygian || soloScale == aolian || soloScale == locrian) {
+                } else if (soloScale == dorian || soloScale == phrygian || soloScale == aolian || soloScale == locrian || soloScale == altered) {
                     scaleSharpFlatNat = "b";
                 } else {
                     scaleSharpFlatNat = "";
@@ -227,7 +267,7 @@ class Chord {
     //generate a random solo
     func generateSolo() {
         var ctr = 0;
-        while (ctr < scaleLengthLimit + 1) {
+        while (ctr < soloLength) {
             solo.append(soloNoteBank[Int(arc4random_uniform(UInt32(scaleLengthLimit)))]);
             ctr += 1;
         }

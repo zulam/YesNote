@@ -6,23 +6,25 @@
 //  Copyright © 2017 Zack Ulam. All rights reserved.
 //
 
-import Foundation
-import Darwin
-
-var root: String;
-var qual: String;
-
 while usingApp {
-    
     //enter chord info
     print("Enter the chord tone: ");
-    root = readLine()!;
+    let root = readLine()!;
 
     print("Enter the chord Quality (maj, min, maj7, etc.) : ");
-    qual = readLine()!;
-
+    let qual = readLine()!;
+    
+    print("Enter the number of measures (8 notes/measure): ");
+    let length = Int(readLine()!);
+    
     //initializing chord
-    var myChord = Chord(root: root, quality: qual);
+    var myChord = Chord(root: root, quality: qual, length: length!);
+    
+    if (myChord.soloScale == [-1]) {
+        myChord.specificSelector();
+    }
+    
+    print(myChord.soloScale);
 
     //determining if scale pulls from sharps, flats, or nats
     myChord.determineSFN();
@@ -43,9 +45,10 @@ while usingApp {
 
     //print results
     myChord.printResults();
-    
+
     keepUsing();
 }
+
 
 
 
