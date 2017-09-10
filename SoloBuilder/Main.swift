@@ -7,10 +7,12 @@
 //
 
 while usingApp {
+    startIndex = 0;
+    scaleLengthLimit = 7;
     //enter chord info
     print("Enter the chord tone: ");
     let root = readLine()!;
-
+    
     print("Enter the chord Quality (maj, min, maj7, etc.) : ");
     let qual = readLine()!;
     
@@ -25,29 +27,54 @@ while usingApp {
     }
     
     print(myChord.soloScale);
-
+    
     //determining if scale pulls from sharps, flats, or nats
     myChord.determineSFN();
-
+    
     //find starting index from scale
     myChord.findStart();
-
+    
     //determining all notes in scale
     switch(myChord.scaleSharpFlatNat) {
-        case "#": myChord.determineNoteBankSharp()
-        case "b": myChord.determineNoteBankFlat()
-        case "": myChord.determineNoteBankNat()
-        default: myChord.determineNoteBankNat()
+    case "#": myChord.determineNoteBankSharp()
+    case "b": myChord.determineNoteBankFlat()
+    case "": myChord.determineNoteBankNat()
+    default: myChord.determineNoteBankNat()
     }
-
+    
     //random solo generator for chord
     myChord.generateSolo();
-
+    
     //print results
     myChord.printResults();
-
+    
     keepUsing();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
